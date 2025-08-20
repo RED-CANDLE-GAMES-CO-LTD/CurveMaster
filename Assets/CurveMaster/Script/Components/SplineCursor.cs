@@ -77,6 +77,12 @@ namespace CurveMaster.Components
 
             if (splineManager != null)
             {
+                // 確保 SplineManager 已初始化
+                if (splineManager.Spline == null)
+                {
+                    splineManager.ForceInitializeSpline();
+                }
+                
                 SetSpline(splineManager.Spline);
                 UpdateTransform();
             }
@@ -94,7 +100,17 @@ namespace CurveMaster.Components
 
         public void UpdateTransform()
         {
-            if (splineManager == null || currentSpline == null)
+            if (splineManager == null)
+                return;
+                
+            // 確保曲線存在
+            if (splineManager.Spline == null)
+            {
+                splineManager.ForceInitializeSpline();
+                currentSpline = splineManager.Spline;
+            }
+            
+            if (currentSpline == null)
                 return;
 
             Vector3 worldPosition = splineManager.GetWorldPoint(position);

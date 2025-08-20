@@ -178,5 +178,121 @@ namespace CurveMaster.Splines
         {
             return handleIn.Count;
         }
+        
+        /// <summary>
+        /// 重置指定控制點的手柄
+        /// </summary>
+        public void ResetHandles(int index)
+        {
+            if (index < 0 || index >= controlPoints.Length)
+                return;
+                
+            Vector3 prevPoint = index > 0 ? controlPoints[index - 1] : controlPoints[index];
+            Vector3 nextPoint = index < controlPoints.Length - 1 ? controlPoints[index + 1] : controlPoints[index];
+            Vector3 currentPoint = controlPoints[index];
+            
+            // 計算切線方向
+            Vector3 tangent = (nextPoint - prevPoint).normalized;
+            float distance = Vector3.Distance(prevPoint, nextPoint) * 0.25f;
+            
+            // 重置控制手柄
+            if (index > 0)
+                handleIn[index] = currentPoint - tangent * distance;
+            else
+                handleIn[index] = currentPoint;
+                
+            if (index < controlPoints.Length - 1)
+                handleOut[index] = currentPoint + tangent * distance;
+            else
+                handleOut[index] = currentPoint;
+                
+            SetDirty();
+        }
+        
+        /// <summary>
+        /// 重置所有手柄
+        /// </summary>
+        public void ResetAllHandles()
+        {
+            GenerateHandles();
+            SetDirty();
+        }
+        
+        /// <summary>
+        /// 設定手柄對稱模式
+        /// </summary>
+        public void SetHandleSymmetric(int index, bool symmetric)
+        {
+            if (index < 0 || index >= controlPoints.Length)
+                return;
+                
+            if (symmetric && index > 0 && index < controlPoints.Length - 1)
+            {
+                // 計算對稱手柄
+                Vector3 currentPoint = controlPoints[index];
+                Vector3 handleInDir = (handleIn[index] - currentPoint).normalized;
+                Vector3 handleOutDir = (handleOut[index] - currentPoint).normalized;
+                
+                // 使用平均方向
+                Vector3 avgDir = ((handleOut[index] - currentPoint) - (handleIn[index] - currentPoint)).normalized;
+                float inDistance = Vector3.Distance(handleIn[index], currentPoint);
+                float outDistance = Vector3.Distance(handleOut[index], currentPoint);
+                
+                handleIn[index] = currentPoint - avgDir * inDistance;
+                handleOut[index] = currentPoint + avgDir * outDistance;
+                
+                SetDirty();
+            }
+        }
+        
+        /// <summary>
+        /// 鏡像對稱調整手柄
+        /// </summary>
+        public void MirrorHandle(int index, bool isHandleOut)
+        {
+            if (index < 0 || index >= controlPoints.Length)
+                return;
+                
+            Vector3 currentPoint = controlPoints[index];
+            
+            if (isHandleOut && index > 0)
+            {
+                // 根據出手柄鏡像調整入手柄
+                Vector3 mirrorHandle = currentPoint + (currentPoint - handleOut[index]);
+                handleIn[index] = mirrorHandle;
+            }
+            else if (!isHandleOut && index < controlPoints.Length - 1)
+            {
+                // 根據入手柄鏡像調整出手柄
+                Vector3 mirrorHandle = currentPoint + (currentPoint - handleIn[index]);
+                handleOut[index] = mirrorHandle;
+            }
+            
+            SetDirty();
+        }
+        
+        /// <summary>
+        /// 取得所有手柄資料（用於序列化）
+        /// </summary>
+        public void GetHandles(out List<Vector3> inHandles, out List<Vector3> outHandles)
+        {
+            inHandles = new List<Vector3>(handleIn);
+            outHandles = new List<Vector3>(handleOut);
+        }
+        
+        /// <summary>
+        /// 設定所有手柄資料（用於反序列化）
+        /// </summary>
+        public void SetHandles(List<Vector3> inHandles, List<Vector3> outHandles)
+        {
+            if (inHandles != null && outHandles != null &&
+                inHandles.Count == controlPoints.Length && 
+                outHandles.Count == controlPoints.Length)
+            {
+                handleIn = new List<Vector3>(inHandles);
+                handleOut = new List<Vector3>(outHandles);
+                SetDirty();
+            }
+        }
     }
 }

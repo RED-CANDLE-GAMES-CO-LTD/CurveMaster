@@ -23,6 +23,12 @@ namespace CurveMaster.Editor
             positionProp = serializedObject.FindProperty("position");
             alignToTangentProp = serializedObject.FindProperty("alignToTangent");
             autoUpdateProp = serializedObject.FindProperty("autoUpdate");
+            
+            // 強制初始化並更新位置
+            if (cursor != null)
+            {
+                cursor.UpdateTransform();
+            }
         }
 
         public override void OnInspectorGUI()

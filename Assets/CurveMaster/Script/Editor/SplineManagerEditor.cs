@@ -3,6 +3,7 @@ using UnityEditor;
 using CurveMaster.Components;
 using CurveMaster.Core;
 using CurveMaster.Splines;
+using System.Collections.Generic;
 
 namespace CurveMaster.Editor
 {
@@ -19,6 +20,11 @@ namespace CurveMaster.Editor
         private SerializedProperty resolutionProp;
         private SerializedProperty autoDetectControlPointsProp;
         private SerializedProperty autoUpdateCursorsProp;
+        
+        // 貝茲曲線編輯狀態
+        private int selectedHandleIndex = -1;
+        private bool symmetricMode = true;
+        private bool showHandleInfo = true;
 
         private void OnEnable()
         {
@@ -30,11 +36,14 @@ namespace CurveMaster.Editor
             autoDetectControlPointsProp = serializedObject.FindProperty("autoDetectControlPoints");
             autoUpdateCursorsProp = serializedObject.FindProperty("autoUpdateCursors");
             
-            // 初始重新整理控制點清單
+            // 初始重新整理控制點清單並強制初始化曲線
             if (splineManager.AutoDetectControlPoints)
             {
                 splineManager.RefreshControlPointsList();
             }
+            
+            // 確保曲線已經初始化並更新
+            splineManager.ForceInitializeSpline();
         }
 
         public override void OnInspectorGUI()
@@ -119,6 +128,12 @@ namespace CurveMaster.Editor
                 EditorGUILayout.LabelField("曲線資訊", EditorStyles.boldLabel);
                 EditorGUILayout.LabelField($"曲線長度: {splineManager.GetLength():F2}");
                 EditorGUILayout.LabelField($"控制點數量: {splineManager.ControlPointTransforms.Count}");
+                
+                // 貝茲曲線特殊控制
+                if (splineManager.CurrentType == SplineType.BezierSpline)
+                {
+                    DrawBezierControls();
+                }
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -226,6 +241,12 @@ namespace CurveMaster.Editor
                     {
                         Undo.RecordObject(splineManager, "調整貝茲手柄");
                         bezier.SetHandleIn(i, splineManager.transform.InverseTransformPoint(handleInWorld));
+                        
+                        // 如果啟用對稱模式，鏡像調整出手柄
+                        if (symmetricMode && i < controlPoints.Count - 1)
+                        {
+                            bezier.MirrorHandle(i, false);
+                        }
                     }
                     
                     // 繪製手柄球體
@@ -250,11 +271,10 @@ namespace CurveMaster.Editor
                         Undo.RecordObject(splineManager, "調整貝茲手柄");
                         bezier.SetHandleOut(i, splineManager.transform.InverseTransformPoint(handleOutWorld));
                         
-                        // 鏡像對稱調整
-                        if (i > 0)
+                        // 如果啟用對稱模式，鏡像調整入手柄
+                        if (symmetricMode && i > 0)
                         {
-                            Vector3 mirrorHandle = worldPos + (worldPos - handleOutWorld);
-                            bezier.SetHandleIn(i, splineManager.transform.InverseTransformPoint(mirrorHandle));
+                            bezier.MirrorHandle(i, true);
                         }
                     }
                     
@@ -329,6 +349,137 @@ namespace CurveMaster.Editor
             Handles.color = Color.white;
             Handles.Label(midPoint + Vector3.up * 0.5f, 
                 $"[{splineManager.CurrentType}]\n長度: {splineManager.GetLength():F2} 單位");
+        }
+        
+        private void DrawBezierControls()
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("貝茲曲線控制", EditorStyles.boldLabel);
+            
+            BezierSpline bezier = splineManager.Spline as BezierSpline;
+            if (bezier == null)
+                return;
+            
+            // 全域控制
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("重置所有手柄"))
+            {
+                Undo.RecordObject(splineManager, "重置貝茲手柄");
+                bezier.ResetAllHandles();
+                EditorUtility.SetDirty(splineManager);
+            }
+            
+            symmetricMode = GUILayout.Toggle(symmetricMode, "對稱模式", "Button");
+            showHandleInfo = GUILayout.Toggle(showHandleInfo, "顯示參數", "Button");
+            EditorGUILayout.EndHorizontal();
+            
+            // 顯示每個控制點的手柄參數
+            if (showHandleInfo)
+            {
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("手柄參數", EditorStyles.boldLabel);
+                
+                for (int i = 0; i < splineManager.ControlPointTransforms.Count; i++)
+                {
+                    Transform controlPoint = splineManager.ControlPointTransforms[i];
+                    if (controlPoint == null)
+                        continue;
+                    
+                    EditorGUILayout.BeginVertical("box");
+                    
+                    // 控制點標題
+                    EditorGUILayout.BeginHorizontal();
+                    bool isExpanded = selectedHandleIndex == i;
+                    if (GUILayout.Button(isExpanded ? "▼" : "▶", GUILayout.Width(20)))
+                    {
+                        selectedHandleIndex = isExpanded ? -1 : i;
+                    }
+                    EditorGUILayout.LabelField($"控制點 {i + 1}: {controlPoint.name}");
+                    
+                    if (GUILayout.Button("重置", GUILayout.Width(50)))
+                    {
+                        Undo.RecordObject(splineManager, $"重置控制點 {i + 1} 手柄");
+                        bezier.ResetHandles(i);
+                        EditorUtility.SetDirty(splineManager);
+                    }
+                    EditorGUILayout.EndHorizontal();
+                    
+                    // 展開的手柄參數
+                    if (selectedHandleIndex == i)
+                    {
+                        EditorGUI.indentLevel++;
+                        
+                        // 入手柄
+                        if (i > 0)
+                        {
+                            EditorGUILayout.LabelField("入手柄 (橘色)", EditorStyles.miniBoldLabel);
+                            Vector3 handleInLocal = bezier.GetHandleIn(i);
+                            Vector3 handleInWorld = splineManager.transform.TransformPoint(handleInLocal);
+                            
+                            EditorGUI.BeginChangeCheck();
+                            Vector3 newHandleInWorld = EditorGUILayout.Vector3Field("世界座標", handleInWorld);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                Undo.RecordObject(splineManager, "調整入手柄");
+                                bezier.SetHandleIn(i, splineManager.transform.InverseTransformPoint(newHandleInWorld));
+                                
+                                if (symmetricMode)
+                                {
+                                    bezier.MirrorHandle(i, false);
+                                }
+                                EditorUtility.SetDirty(splineManager);
+                            }
+                            
+                            Vector3 offset = handleInLocal - splineManager.transform.InverseTransformPoint(controlPoint.position);
+                            EditorGUILayout.Vector3Field("相對偏移", offset);
+                            EditorGUILayout.FloatField("距離", offset.magnitude);
+                        }
+                        
+                        // 出手柄
+                        if (i < splineManager.ControlPointTransforms.Count - 1)
+                        {
+                            EditorGUILayout.LabelField("出手柄 (藍色)", EditorStyles.miniBoldLabel);
+                            Vector3 handleOutLocal = bezier.GetHandleOut(i);
+                            Vector3 handleOutWorld = splineManager.transform.TransformPoint(handleOutLocal);
+                            
+                            EditorGUI.BeginChangeCheck();
+                            Vector3 newHandleOutWorld = EditorGUILayout.Vector3Field("世界座標", handleOutWorld);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                Undo.RecordObject(splineManager, "調整出手柄");
+                                bezier.SetHandleOut(i, splineManager.transform.InverseTransformPoint(newHandleOutWorld));
+                                
+                                if (symmetricMode && i > 0)
+                                {
+                                    bezier.MirrorHandle(i, true);
+                                }
+                                EditorUtility.SetDirty(splineManager);
+                            }
+                            
+                            Vector3 offset = handleOutLocal - splineManager.transform.InverseTransformPoint(controlPoint.position);
+                            EditorGUILayout.Vector3Field("相對偏移", offset);
+                            EditorGUILayout.FloatField("距離", offset.magnitude);
+                        }
+                        
+                        // 對稱操作按鈕
+                        if (i > 0 && i < splineManager.ControlPointTransforms.Count - 1)
+                        {
+                            EditorGUILayout.BeginHorizontal();
+                            if (GUILayout.Button("強制對稱"))
+                            {
+                                Undo.RecordObject(splineManager, "強制對稱手柄");
+                                bezier.SetHandleSymmetric(i, true);
+                                EditorUtility.SetDirty(splineManager);
+                            }
+                            EditorGUILayout.EndHorizontal();
+                        }
+                        
+                        EditorGUI.indentLevel--;
+                    }
+                    
+                    EditorGUILayout.EndVertical();
+                }
+            }
         }
     }
 }

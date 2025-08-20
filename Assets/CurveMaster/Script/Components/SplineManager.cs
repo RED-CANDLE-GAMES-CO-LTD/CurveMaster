@@ -33,12 +33,17 @@ namespace CurveMaster.Components
 
         private void Awake()
         {
-            InitializeSpline();
+            // 立即初始化曲線
+            ForceInitializeSpline();
         }
 
         private void OnEnable()
         {
-            InitializeSpline();
+            // 確保曲線已初始化
+            if (currentSpline == null)
+            {
+                ForceInitializeSpline();
+            }
         }
 
         private void Update()
@@ -55,7 +60,12 @@ namespace CurveMaster.Components
 
         private void InitializeSpline()
         {
-            CreateSpline(splineType);
+            // 確保曲線實例存在
+            if (currentSpline == null)
+            {
+                CreateSpline(splineType);
+            }
+            
             if (autoDetectControlPoints)
             {
                 RefreshControlPointsList();
@@ -337,6 +347,27 @@ namespace CurveMaster.Components
         {
             UpdateAllCursors();
         }
+        
+        /// <summary>
+        /// 強制初始化曲線（編輯器用）
+        /// </summary>
+        public void ForceInitializeSpline()
+        {
+            // 確保曲線實例存在
+            if (currentSpline == null)
+            {
+                CreateSpline(splineType);
+            }
+            
+            // 重新整理控制點
+            if (autoDetectControlPoints)
+            {
+                RefreshControlPointsList();
+            }
+            
+            // 強制更新控制點到曲線
+            UpdateControlPoints();
+        }
 
         private void OnDrawGizmos()
         {
@@ -353,7 +384,7 @@ namespace CurveMaster.Components
             // 在編輯器模式下確保初始化
             if (!Application.isPlaying && currentSpline == null)
             {
-                InitializeSpline();
+                ForceInitializeSpline();
             }
 
             if (currentSpline == null || cachedControlPoints == null || cachedControlPoints.Length < 2)
