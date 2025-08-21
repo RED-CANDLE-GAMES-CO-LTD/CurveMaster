@@ -39,8 +39,8 @@ namespace CurveMaster.Editor
         {
             serializedObject.Update();
             
-            // 標題
-            EditorGUILayout.LabelField("曲線追蹤管理器", EditorStyles.boldLabel);
+            // Title
+            EditorGUILayout.LabelField("Spline Tracker Manager", EditorStyles.boldLabel);
             EditorGUILayout.Space();
             
             // 全域設定
@@ -78,12 +78,12 @@ namespace CurveMaster.Editor
         private void DrawGlobalSettings()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("全域設定", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Global Settings", EditorStyles.boldLabel);
             
-            EditorGUILayout.PropertyField(enableGlobalTracking, new GUIContent("啟用全域追蹤"));
+            EditorGUILayout.PropertyField(enableGlobalTracking, new GUIContent("Enable Global Tracking"));
             
             EditorGUI.BeginDisabledGroup(!enableGlobalTracking.boolValue);
-            EditorGUILayout.PropertyField(globalSpeedMultiplier, new GUIContent("速度倍率"));
+            EditorGUILayout.PropertyField(globalSpeedMultiplier, new GUIContent("Speed Multiplier"));
             EditorGUI.EndDisabledGroup();
             
             EditorGUILayout.EndVertical();
@@ -93,36 +93,36 @@ namespace CurveMaster.Editor
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             
-            showQuickSetup = EditorGUILayout.Foldout(showQuickSetup, "快速設定工具", true);
+            showQuickSetup = EditorGUILayout.Foldout(showQuickSetup, "Quick Setup Tools", true);
             
             if (showQuickSetup)
             {
                 EditorGUILayout.Space(5);
                 
-                // 兩端追蹤設定
-                EditorGUILayout.LabelField("兩端追蹤設定", EditorStyles.miniBoldLabel);
+                // Endpoint tracking setup
+                EditorGUILayout.LabelField("Endpoint Tracking Setup", EditorStyles.miniBoldLabel);
                 quickTargets[0] = (GameObject)EditorGUILayout.ObjectField(
-                    "起點目標", quickTargets[0], typeof(GameObject), true);
+                    "Start Target", quickTargets[0], typeof(GameObject), true);
                 quickTargets[1] = (GameObject)EditorGUILayout.ObjectField(
-                    "終點目標", quickTargets[1], typeof(GameObject), true);
+                    "End Target", quickTargets[1], typeof(GameObject), true);
                 
-                if (GUILayout.Button("設定兩端追蹤"))
+                if (GUILayout.Button("Setup Endpoint Tracking"))
                 {
                     SetupEndPointTracking();
                 }
                 
                 EditorGUILayout.Space(5);
                 
-                // 自動偵測場景物件
-                if (GUILayout.Button("自動偵測場景目標"))
+                // Auto detect scene objects
+                if (GUILayout.Button("Auto Detect Scene Targets"))
                 {
                     AutoDetectTargets();
                 }
                 
-                // 清除設定
-                if (GUILayout.Button("清除所有追蹤", GUILayout.Height(25)))
+                // Clear settings
+                if (GUILayout.Button("Clear All Tracking", GUILayout.Height(25)))
                 {
-                    if (EditorUtility.DisplayDialog("確認", "確定要清除所有追蹤設定嗎？", "確定", "取消"))
+                    if (EditorUtility.DisplayDialog("Confirm", "Are you sure you want to clear all tracking settings?", "Yes", "Cancel"))
                     {
                         manager.ClearAllSetups();
                         EditorUtility.SetDirty(target);
@@ -136,11 +136,11 @@ namespace CurveMaster.Editor
         private void DrawTrackingSetups()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("追蹤設定", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Tracking Settings", EditorStyles.boldLabel);
             
             if (trackingSetups.arraySize == 0)
             {
-                EditorGUILayout.HelpBox("尚未設定任何追蹤關係", MessageType.Info);
+                EditorGUILayout.HelpBox("No tracking relationships configured", MessageType.Info);
             }
             else
             {
@@ -153,7 +153,7 @@ namespace CurveMaster.Editor
             EditorGUILayout.Space(5);
             
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("+ 新增追蹤設定"))
+            if (GUILayout.Button("+ Add Tracking Setup"))
             {
                 trackingSetups.InsertArrayElementAtIndex(trackingSetups.arraySize);
                 var newElement = trackingSetups.GetArrayElementAtIndex(trackingSetups.arraySize - 1);
@@ -191,12 +191,12 @@ namespace CurveMaster.Editor
             {
                 EditorGUI.indentLevel++;
                 
-                EditorGUILayout.PropertyField(name, new GUIContent("名稱"));
-                EditorGUILayout.PropertyField(setup.FindPropertyRelative("controlPoint"), new GUIContent("控制點"));
-                EditorGUILayout.PropertyField(setup.FindPropertyRelative("targetObject"), new GUIContent("追蹤目標"));
-                EditorGUILayout.PropertyField(setup.FindPropertyRelative("trackingMode"), new GUIContent("追蹤模式"));
-                EditorGUILayout.PropertyField(setup.FindPropertyRelative("trackingSpeed"), new GUIContent("追蹤速度"));
-                EditorGUILayout.PropertyField(setup.FindPropertyRelative("offset"), new GUIContent("偏移"));
+                EditorGUILayout.PropertyField(name, new GUIContent("Name"));
+                EditorGUILayout.PropertyField(setup.FindPropertyRelative("controlPoint"), new GUIContent("Control Point"));
+                EditorGUILayout.PropertyField(setup.FindPropertyRelative("targetObject"), new GUIContent("Target Object"));
+                EditorGUILayout.PropertyField(setup.FindPropertyRelative("trackingMode"), new GUIContent("Tracking Mode"));
+                EditorGUILayout.PropertyField(setup.FindPropertyRelative("trackingSpeed"), new GUIContent("Tracking Speed"));
+                EditorGUILayout.PropertyField(setup.FindPropertyRelative("offset"), new GUIContent("Offset"));
                 
                 EditorGUI.indentLevel--;
             }
@@ -207,22 +207,22 @@ namespace CurveMaster.Editor
         private void DrawShapeKeeperSettings()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("形狀維持", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Shape Keeping", EditorStyles.boldLabel);
             
-            EditorGUILayout.PropertyField(autoEnableShapeKeeper, new GUIContent("自動啟用形狀維持"));
+            EditorGUILayout.PropertyField(autoEnableShapeKeeper, new GUIContent("Auto Enable Shape Keeper"));
             
             if (autoEnableShapeKeeper.boolValue)
             {
-                EditorGUILayout.PropertyField(defaultShapeMode, new GUIContent("預設形狀模式"));
+                EditorGUILayout.PropertyField(defaultShapeMode, new GUIContent("Default Shape Mode"));
             }
             
             // 檢查是否有 ShapeKeeper
             var shapeKeeper = manager.GetComponent<SplineShapeKeeper>();
             if (shapeKeeper == null && autoEnableShapeKeeper.boolValue)
             {
-                EditorGUILayout.HelpBox("將在執行時自動加入 SplineShapeKeeper 元件", MessageType.Info);
+                EditorGUILayout.HelpBox("SplineShapeKeeper component will be added automatically at runtime", MessageType.Info);
                 
-                if (GUILayout.Button("立即加入 ShapeKeeper"))
+                if (GUILayout.Button("Add ShapeKeeper Now"))
                 {
                     shapeKeeper = manager.gameObject.AddComponent<SplineShapeKeeper>();
                     EditorUtility.SetDirty(manager.gameObject);
@@ -230,9 +230,9 @@ namespace CurveMaster.Editor
             }
             else if (shapeKeeper != null)
             {
-                EditorGUILayout.HelpBox("已有 SplineShapeKeeper 元件", MessageType.None);
+                EditorGUILayout.HelpBox("SplineShapeKeeper component already exists", MessageType.None);
                 
-                if (GUILayout.Button("重新偵測追蹤器"))
+                if (GUILayout.Button("Re-detect Trackers"))
                 {
                     shapeKeeper.DetectAndConfigureTrackers();
                     EditorUtility.SetDirty(shapeKeeper);
@@ -245,10 +245,10 @@ namespace CurveMaster.Editor
         private void DrawDebugSettings()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("偵錯", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Debug", EditorStyles.boldLabel);
             
-            EditorGUILayout.PropertyField(showDebugInfo, new GUIContent("顯示偵錯資訊"));
-            EditorGUILayout.PropertyField(visualizeConnections, new GUIContent("視覺化連線"));
+            EditorGUILayout.PropertyField(showDebugInfo, new GUIContent("Show Debug Info"));
+            EditorGUILayout.PropertyField(visualizeConnections, new GUIContent("Visualize Connections"));
             
             if (Application.isPlaying)
             {
@@ -261,17 +261,17 @@ namespace CurveMaster.Editor
         private void DrawActionButtons()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("操作", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Actions", EditorStyles.boldLabel);
             
             EditorGUILayout.BeginHorizontal();
             
-            if (GUILayout.Button("套用所有設定", GUILayout.Height(30)))
+            if (GUILayout.Button("Apply All Settings", GUILayout.Height(30)))
             {
                 manager.ApplyAllSetups();
                 EditorUtility.SetDirty(target);
             }
             
-            if (GUILayout.Button("重設所有速度", GUILayout.Height(30)))
+            if (GUILayout.Button("Reset All Speeds", GUILayout.Height(30)))
             {
                 manager.SetAllTrackingSpeeds(5f);
                 EditorUtility.SetDirty(target);
@@ -281,20 +281,20 @@ namespace CurveMaster.Editor
             
             EditorGUILayout.BeginHorizontal();
             
-            // 批次設定模式按鈕
-            if (GUILayout.Button("全部設為 Direct"))
+            // Batch mode settings buttons
+            if (GUILayout.Button("Set All to Direct"))
             {
                 manager.SetAllTrackingModes(SplineTargetTracker.TrackingMode.Direct);
                 EditorUtility.SetDirty(target);
             }
             
-            if (GUILayout.Button("全部設為 Smooth"))
+            if (GUILayout.Button("Set All to Smooth"))
             {
                 manager.SetAllTrackingModes(SplineTargetTracker.TrackingMode.Smooth);
                 EditorUtility.SetDirty(target);
             }
             
-            if (GUILayout.Button("全部設為 Spring"))
+            if (GUILayout.Button("Set All to Spring"))
             {
                 manager.SetAllTrackingModes(SplineTargetTracker.TrackingMode.Spring);
                 EditorUtility.SetDirty(target);
@@ -309,7 +309,7 @@ namespace CurveMaster.Editor
         {
             if (quickTargets[0] == null && quickTargets[1] == null)
             {
-                EditorUtility.DisplayDialog("錯誤", "請至少設定一個目標物件", "確定");
+                EditorUtility.DisplayDialog("Error", "Please set at least one target object", "OK");
                 return;
             }
             
@@ -318,7 +318,7 @@ namespace CurveMaster.Editor
             
             if (controlPoints.Count < 2)
             {
-                EditorUtility.DisplayDialog("錯誤", "需要至少兩個控制點", "確定");
+                EditorUtility.DisplayDialog("Error", "At least two control points required", "OK");
                 return;
             }
             
@@ -367,17 +367,17 @@ namespace CurveMaster.Editor
             {
                 manager.AutoMatchTargets(potentialTargets.ToArray());
                 EditorUtility.SetDirty(target);
-                Debug.Log($"自動配對了 {potentialTargets.Count} 個目標");
+                Debug.Log($"Auto-matched {potentialTargets.Count} targets");
             }
             else
             {
-                EditorUtility.DisplayDialog("提示", "未找到合適的目標物件", "確定");
+                EditorUtility.DisplayDialog("Info", "No suitable target objects found", "OK");
             }
         }
         
         private void InitializeTrackingSetup(SerializedProperty setup)
         {
-            setup.FindPropertyRelative("name").stringValue = "新追蹤設定";
+            setup.FindPropertyRelative("name").stringValue = "New Tracking Setup";
             setup.FindPropertyRelative("enabled").boolValue = true;
             setup.FindPropertyRelative("trackingSpeed").floatValue = 5f;
             setup.FindPropertyRelative("trackingMode").enumValueIndex = (int)SplineTargetTracker.TrackingMode.Smooth;

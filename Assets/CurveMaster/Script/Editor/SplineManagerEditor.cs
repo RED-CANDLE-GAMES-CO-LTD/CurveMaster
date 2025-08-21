@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace CurveMaster.Editor
 {
     /// <summary>
-    /// SplineManager 編輯器
+    /// SplineManager Editor
     /// </summary>
     [CustomEditor(typeof(SplineManager))]
     public class SplineManagerEditor : UnityEditor.Editor
@@ -21,7 +21,7 @@ namespace CurveMaster.Editor
         private SerializedProperty autoDetectControlPointsProp;
         private SerializedProperty autoUpdateCursorsProp;
         
-        // 貝茲曲線編輯狀態
+        // Bezier curve editing state
         private int selectedHandleIndex = -1;
         private bool symmetricMode = true;
         private bool showHandleInfo = true;
@@ -36,13 +36,13 @@ namespace CurveMaster.Editor
             autoDetectControlPointsProp = serializedObject.FindProperty("autoDetectControlPoints");
             autoUpdateCursorsProp = serializedObject.FindProperty("autoUpdateCursors");
             
-            // 初始重新整理控制點清單並強制初始化曲線
+            // Initial refresh control points list and force initialize spline
             if (splineManager.AutoDetectControlPoints)
             {
                 splineManager.RefreshControlPointsList();
             }
             
-            // 確保曲線已經初始化並更新
+            // Ensure spline has been initialized and updated
             splineManager.ForceInitializeSpline();
         }
 
@@ -51,26 +51,26 @@ namespace CurveMaster.Editor
             serializedObject.Update();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("曲線設定", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Spline Settings", EditorStyles.boldLabel);
             
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(splineTypeProp, new GUIContent("曲線類型"));
+            EditorGUILayout.PropertyField(splineTypeProp, new GUIContent("Spline Type"));
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
                 splineManager.SwitchSplineType((SplineType)splineTypeProp.enumValueIndex);
             }
 
-            EditorGUILayout.PropertyField(autoUpdateProp, new GUIContent("自動更新", "控制點變更時自動更新曲線"));
-            EditorGUILayout.PropertyField(autoUpdateCursorsProp, new GUIContent("自動更新游標", "控制點變更時自動更新所有 SplineCursor 的位置"));
-            EditorGUILayout.PropertyField(splineColorProp, new GUIContent("曲線顏色"));
-            EditorGUILayout.PropertyField(resolutionProp, new GUIContent("繪製解析度"));
+            EditorGUILayout.PropertyField(autoUpdateProp, new GUIContent("Auto Update", "Automatically update spline when control points change"));
+            EditorGUILayout.PropertyField(autoUpdateCursorsProp, new GUIContent("Auto Update Cursors", "Automatically update all SplineCursor positions when control points change"));
+            EditorGUILayout.PropertyField(splineColorProp, new GUIContent("Spline Color"));
+            EditorGUILayout.PropertyField(resolutionProp, new GUIContent("Draw Resolution"));
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("控制點", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Control Points", EditorStyles.boldLabel);
             
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(autoDetectControlPointsProp, new GUIContent("自動偵測子物件"));
+            EditorGUILayout.PropertyField(autoDetectControlPointsProp, new GUIContent("Auto Detect Children"));
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
@@ -82,42 +82,42 @@ namespace CurveMaster.Editor
             
             if (splineManager.AutoDetectControlPoints)
             {
-                EditorGUILayout.HelpBox("控制點會自動從子物件偵測", MessageType.Info);
+                EditorGUILayout.HelpBox("Control points will be automatically detected from child objects", MessageType.Info);
                 
-                // 顯示偵測到的控制點（唯讀）
+                // Display detected control points (read-only)
                 EditorGUI.BeginDisabledGroup(true);
                 EditorGUI.indentLevel++;
                 for (int i = 0; i < splineManager.ControlPointTransforms.Count; i++)
                 {
                     Transform t = splineManager.ControlPointTransforms[i];
-                    EditorGUILayout.ObjectField($"控制點 {i + 1}", t, typeof(Transform), true);
+                    EditorGUILayout.ObjectField($"Control Point {i + 1}", t, typeof(Transform), true);
                 }
                 EditorGUI.indentLevel--;
                 EditorGUI.EndDisabledGroup();
             }
             else
             {
-                EditorGUILayout.HelpBox("手動模式 - 請手動指定控制點", MessageType.Warning);
+                EditorGUILayout.HelpBox("Manual mode - Please manually specify control points", MessageType.Warning);
             }
 
             EditorGUILayout.Space();
             
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("新增控制點"))
+            if (GUILayout.Button("Add Control Point"))
             {
                 AddControlPoint();
             }
-            if (GUILayout.Button("清除所有控制點"))
+            if (GUILayout.Button("Clear All Control Points"))
             {
-                if (EditorUtility.DisplayDialog("確認", "確定要清除所有控制點嗎？", "確定", "取消"))
+                if (EditorUtility.DisplayDialog("Confirm", "Are you sure you want to clear all control points?", "OK", "Cancel"))
                 {
                     splineManager.ClearControlPoints();
                 }
             }
             EditorGUILayout.EndHorizontal();
             
-            // 手動更新 Cursor 按鈕
-            if (GUILayout.Button("更新所有游標位置"))
+            // Manual update cursor button
+            if (GUILayout.Button("Update All Cursor Positions"))
             {
                 splineManager.ForceUpdateAllCursors();
             }
@@ -125,11 +125,11 @@ namespace CurveMaster.Editor
             if (splineManager.Spline != null)
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.LabelField("曲線資訊", EditorStyles.boldLabel);
-                EditorGUILayout.LabelField($"曲線長度: {splineManager.GetLength():F2}");
-                EditorGUILayout.LabelField($"控制點數量: {splineManager.ControlPointTransforms.Count}");
+                EditorGUILayout.LabelField("Spline Info", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField($"Spline Length: {splineManager.GetLength():F2}");
+                EditorGUILayout.LabelField($"Control Point Count: {splineManager.ControlPointTransforms.Count}");
                 
-                // 貝茲曲線特殊控制
+                // Bezier curve special controls
                 if (splineManager.CurrentType == SplineType.BezierSpline)
                 {
                     DrawBezierControls();
@@ -151,7 +151,7 @@ namespace CurveMaster.Editor
             
             Selection.activeGameObject = controlPoint;
             
-            // 如果是自動偵測模式，重新整理清單
+            // If in auto detect mode, refresh the list
             if (splineManager.AutoDetectControlPoints)
             {
                 EditorApplication.delayCall += () => splineManager.RefreshControlPointsList();
@@ -181,23 +181,23 @@ namespace CurveMaster.Editor
                 Vector3 newPosition = Handles.PositionHandle(controlPoint.position, controlPoint.rotation);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RecordObject(controlPoint, "移動控制點");
+                    Undo.RecordObject(controlPoint, "Move Control Point");
                     controlPoint.position = newPosition;
                 }
 
-                // 繪製數字標注
+                // Draw number labels
                 GUIStyle style = new GUIStyle();
                 style.normal.textColor = Color.white;
                 style.fontSize = 14;
                 style.fontStyle = FontStyle.Bold;
                 style.alignment = TextAnchor.MiddleCenter;
                 
-                // 背景圓圈
+                // Background circle
                 Handles.color = new Color(0, 0, 0, 0.7f);
                 float size = HandleUtility.GetHandleSize(controlPoint.position) * 0.15f;
                 Handles.DrawSolidDisc(controlPoint.position + Vector3.up * 0.5f, Camera.current.transform.forward, size);
                 
-                // 數字
+                // Number
                 Handles.Label(controlPoint.position + Vector3.up * 0.5f, (i + 1).ToString(), style);
             }
 
@@ -216,7 +216,7 @@ namespace CurveMaster.Editor
             if (bezier == null)
                 return;
             
-            // 繪製每個控制點的貝茲手柄
+            // Draw Bezier handles for each control point
             var controlPoints = splineManager.ControlPointTransforms;
             for (int i = 0; i < controlPoints.Count; i++)
             {
@@ -226,7 +226,7 @@ namespace CurveMaster.Editor
                 
                 Vector3 worldPos = controlPoint.position;
                 
-                // 繪製入手柄
+                // Draw in handle
                 if (i > 0)
                 {
                     Vector3 handleInLocal = bezier.GetHandleIn(i);
@@ -239,23 +239,23 @@ namespace CurveMaster.Editor
                     handleInWorld = Handles.PositionHandle(handleInWorld, Quaternion.identity);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject(splineManager, "調整貝茲手柄");
+                        Undo.RecordObject(splineManager, "Adjust Bezier Handle");
                         bezier.SetHandleIn(i, splineManager.transform.InverseTransformPoint(handleInWorld));
                         
-                        // 如果啟用對稱模式，鏡像調整出手柄
+                        // If symmetric mode is enabled, mirror adjust out handle
                         if (symmetricMode && i < controlPoints.Count - 1)
                         {
                             bezier.MirrorHandle(i, false);
                         }
                     }
                     
-                    // 繪製手柄球體
+                    // Draw handle sphere
                     Handles.color = new Color(1f, 0.5f, 0f, 1f);
                     float size = HandleUtility.GetHandleSize(handleInWorld) * 0.08f;
                     Handles.SphereHandleCap(0, handleInWorld, Quaternion.identity, size, EventType.Repaint);
                 }
                 
-                // 繪製出手柄
+                // Draw out handle
                 if (i < controlPoints.Count - 1)
                 {
                     Vector3 handleOutLocal = bezier.GetHandleOut(i);
@@ -268,17 +268,17 @@ namespace CurveMaster.Editor
                     handleOutWorld = Handles.PositionHandle(handleOutWorld, Quaternion.identity);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject(splineManager, "調整貝茲手柄");
+                        Undo.RecordObject(splineManager, "Adjust Bezier Handle");
                         bezier.SetHandleOut(i, splineManager.transform.InverseTransformPoint(handleOutWorld));
                         
-                        // 如果啟用對稱模式，鏡像調整入手柄
+                        // If symmetric mode is enabled, mirror adjust in handle
                         if (symmetricMode && i > 0)
                         {
                             bezier.MirrorHandle(i, true);
                         }
                     }
                     
-                    // 繪製手柄球體
+                    // Draw handle sphere
                     Handles.color = new Color(0f, 0.5f, 1f, 1f);
                     float size = HandleUtility.GetHandleSize(handleOutWorld) * 0.08f;
                     Handles.SphereHandleCap(0, handleOutWorld, Quaternion.identity, size, EventType.Repaint);
@@ -291,13 +291,13 @@ namespace CurveMaster.Editor
             if (Application.isPlaying)
                 return;
 
-            // 繪製曲線主體
+            // Draw spline main body
             Handles.color = splineManager.SplineColor;
             
-            int segments = splineManager.Resolution * 2; // 提高預覽解析度
+            int segments = splineManager.Resolution * 2; // Increase preview resolution
             Vector3 prevPoint = splineManager.GetWorldPoint(0);
             
-            // 使用較粗的線條
+            // Use thicker lines
             for (int i = 1; i <= segments; i++)
             {
                 float t = i / (float)segments;
@@ -306,10 +306,10 @@ namespace CurveMaster.Editor
                 prevPoint = point;
             }
 
-            // 繪製方向指示器
+            // Draw direction indicators
             DrawDirectionIndicators();
             
-            // 繪製曲線資訊
+            // Draw spline info
             DrawSplineInfo();
         }
 
@@ -334,50 +334,50 @@ namespace CurveMaster.Editor
 
         private void DrawSplineInfo()
         {
-            // 在曲線起點和終點顯示標籤
+            // Show labels at spline start and end points
             Vector3 startPoint = splineManager.GetWorldPoint(0f);
             Vector3 endPoint = splineManager.GetWorldPoint(1f);
             
             Handles.color = Color.green;
-            Handles.Label(startPoint + Vector3.up * 0.2f, "起點");
+            Handles.Label(startPoint + Vector3.up * 0.2f, "Start");
             
             Handles.color = Color.red;
-            Handles.Label(endPoint + Vector3.up * 0.2f, "終點");
+            Handles.Label(endPoint + Vector3.up * 0.2f, "End");
             
-            // 顯示曲線長度
+            // Show spline length
             Vector3 midPoint = splineManager.GetWorldPoint(0.5f);
             Handles.color = Color.white;
             Handles.Label(midPoint + Vector3.up * 0.5f, 
-                $"[{splineManager.CurrentType}]\n長度: {splineManager.GetLength():F2} 單位");
+                $"[{splineManager.CurrentType}]\nLength: {splineManager.GetLength():F2} units");
         }
         
         private void DrawBezierControls()
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("貝茲曲線控制", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Bezier Curve Control", EditorStyles.boldLabel);
             
             BezierSpline bezier = splineManager.Spline as BezierSpline;
             if (bezier == null)
                 return;
             
-            // 全域控制
+            // Global controls
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("重置所有手柄"))
+            if (GUILayout.Button("Reset All Handles"))
             {
-                Undo.RecordObject(splineManager, "重置貝茲手柄");
+                Undo.RecordObject(splineManager, "Reset Bezier Handles");
                 bezier.ResetAllHandles();
                 EditorUtility.SetDirty(splineManager);
             }
             
-            symmetricMode = GUILayout.Toggle(symmetricMode, "對稱模式", "Button");
-            showHandleInfo = GUILayout.Toggle(showHandleInfo, "顯示參數", "Button");
+            symmetricMode = GUILayout.Toggle(symmetricMode, "Symmetric Mode", "Button");
+            showHandleInfo = GUILayout.Toggle(showHandleInfo, "Show Parameters", "Button");
             EditorGUILayout.EndHorizontal();
             
-            // 顯示每個控制點的手柄參數
+            // Show handle parameters for each control point
             if (showHandleInfo)
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.LabelField("手柄參數", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Handle Parameters", EditorStyles.boldLabel);
                 
                 for (int i = 0; i < splineManager.ControlPointTransforms.Count; i++)
                 {
@@ -387,40 +387,40 @@ namespace CurveMaster.Editor
                     
                     EditorGUILayout.BeginVertical("box");
                     
-                    // 控制點標題
+                    // Control point title
                     EditorGUILayout.BeginHorizontal();
                     bool isExpanded = selectedHandleIndex == i;
                     if (GUILayout.Button(isExpanded ? "▼" : "▶", GUILayout.Width(20)))
                     {
                         selectedHandleIndex = isExpanded ? -1 : i;
                     }
-                    EditorGUILayout.LabelField($"控制點 {i + 1}: {controlPoint.name}");
+                    EditorGUILayout.LabelField($"Control Point {i + 1}: {controlPoint.name}");
                     
-                    if (GUILayout.Button("重置", GUILayout.Width(50)))
+                    if (GUILayout.Button("Reset", GUILayout.Width(50)))
                     {
-                        Undo.RecordObject(splineManager, $"重置控制點 {i + 1} 手柄");
+                        Undo.RecordObject(splineManager, $"Reset Control Point {i + 1} Handles");
                         bezier.ResetHandles(i);
                         EditorUtility.SetDirty(splineManager);
                     }
                     EditorGUILayout.EndHorizontal();
                     
-                    // 展開的手柄參數
+                    // Expanded handle parameters
                     if (selectedHandleIndex == i)
                     {
                         EditorGUI.indentLevel++;
                         
-                        // 入手柄
+                        // In handle
                         if (i > 0)
                         {
-                            EditorGUILayout.LabelField("入手柄 (橘色)", EditorStyles.miniBoldLabel);
+                            EditorGUILayout.LabelField("In Handle (Orange)", EditorStyles.miniBoldLabel);
                             Vector3 handleInLocal = bezier.GetHandleIn(i);
                             Vector3 handleInWorld = splineManager.transform.TransformPoint(handleInLocal);
                             
                             EditorGUI.BeginChangeCheck();
-                            Vector3 newHandleInWorld = EditorGUILayout.Vector3Field("世界座標", handleInWorld);
+                            Vector3 newHandleInWorld = EditorGUILayout.Vector3Field("World Position", handleInWorld);
                             if (EditorGUI.EndChangeCheck())
                             {
-                                Undo.RecordObject(splineManager, "調整入手柄");
+                                Undo.RecordObject(splineManager, "Adjust In Handle");
                                 bezier.SetHandleIn(i, splineManager.transform.InverseTransformPoint(newHandleInWorld));
                                 
                                 if (symmetricMode)
@@ -431,22 +431,22 @@ namespace CurveMaster.Editor
                             }
                             
                             Vector3 offset = handleInLocal - splineManager.transform.InverseTransformPoint(controlPoint.position);
-                            EditorGUILayout.Vector3Field("相對偏移", offset);
-                            EditorGUILayout.FloatField("距離", offset.magnitude);
+                            EditorGUILayout.Vector3Field("Relative Offset", offset);
+                            EditorGUILayout.FloatField("Distance", offset.magnitude);
                         }
                         
-                        // 出手柄
+                        // Out handle
                         if (i < splineManager.ControlPointTransforms.Count - 1)
                         {
-                            EditorGUILayout.LabelField("出手柄 (藍色)", EditorStyles.miniBoldLabel);
+                            EditorGUILayout.LabelField("Out Handle (Blue)", EditorStyles.miniBoldLabel);
                             Vector3 handleOutLocal = bezier.GetHandleOut(i);
                             Vector3 handleOutWorld = splineManager.transform.TransformPoint(handleOutLocal);
                             
                             EditorGUI.BeginChangeCheck();
-                            Vector3 newHandleOutWorld = EditorGUILayout.Vector3Field("世界座標", handleOutWorld);
+                            Vector3 newHandleOutWorld = EditorGUILayout.Vector3Field("World Position", handleOutWorld);
                             if (EditorGUI.EndChangeCheck())
                             {
-                                Undo.RecordObject(splineManager, "調整出手柄");
+                                Undo.RecordObject(splineManager, "Adjust Out Handle");
                                 bezier.SetHandleOut(i, splineManager.transform.InverseTransformPoint(newHandleOutWorld));
                                 
                                 if (symmetricMode && i > 0)
@@ -457,17 +457,17 @@ namespace CurveMaster.Editor
                             }
                             
                             Vector3 offset = handleOutLocal - splineManager.transform.InverseTransformPoint(controlPoint.position);
-                            EditorGUILayout.Vector3Field("相對偏移", offset);
-                            EditorGUILayout.FloatField("距離", offset.magnitude);
+                            EditorGUILayout.Vector3Field("Relative Offset", offset);
+                            EditorGUILayout.FloatField("Distance", offset.magnitude);
                         }
                         
-                        // 對稱操作按鈕
+                        // Symmetry operation buttons
                         if (i > 0 && i < splineManager.ControlPointTransforms.Count - 1)
                         {
                             EditorGUILayout.BeginHorizontal();
-                            if (GUILayout.Button("強制對稱"))
+                            if (GUILayout.Button("Force Symmetric"))
                             {
-                                Undo.RecordObject(splineManager, "強制對稱手柄");
+                                Undo.RecordObject(splineManager, "Force Symmetric Handles");
                                 bezier.SetHandleSymmetric(i, true);
                                 EditorUtility.SetDirty(splineManager);
                             }

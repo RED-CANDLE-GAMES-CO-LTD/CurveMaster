@@ -3,23 +3,23 @@ using UnityEngine;
 namespace CurveMaster.Examples
 {
     /// <summary>
-    /// 範例隨機移動腳本
-    /// 使用多個正弦波組合產生流暢的隨機移動
+    /// Example random movement script
+    /// Uses multiple sine wave combinations to generate smooth random movement
     /// </summary>
     public class ExampleRandomMove : MonoBehaviour
     {
-        [Header("移動範圍")]
+        [Header("Movement Range")]
         [SerializeField] private Vector3 moveRange = new Vector3(5f, 2f, 5f);
         
-        [Header("移動速度")]
+        [Header("Movement Speed")]
         [SerializeField] private float baseSpeed = 1f;
         
-        [Header("波動參數")]
-        [SerializeField] private int waveCount = 3; // 每個軸使用的波數量
-        [SerializeField] private float frequencyRange = 2f; // 頻率變化範圍
-        [SerializeField] private float phaseRandomness = 360f; // 相位隨機範圍
+        [Header("Wave Parameters")]
+        [SerializeField] private int waveCount = 3; // Number of waves per axis
+        [SerializeField] private float frequencyRange = 2f; // Frequency variation range
+        [SerializeField] private float phaseRandomness = 360f; // Phase randomness range
         
-        // 內部參數
+        // Internal parameters
         private Vector3 startPosition;
         private float[] xFrequencies;
         private float[] yFrequencies;
@@ -33,16 +33,16 @@ namespace CurveMaster.Examples
         
         private void Start()
         {
-            // 記錄起始位置
+            // Record starting position
             startPosition = transform.position;
             
-            // 初始化波參數
+            // Initialize wave parameters
             InitializeWaveParameters();
         }
         
         private void InitializeWaveParameters()
         {
-            // 初始化陣列
+            // Initialize arrays
             xFrequencies = new float[waveCount];
             yFrequencies = new float[waveCount];
             zFrequencies = new float[waveCount];
@@ -53,21 +53,21 @@ namespace CurveMaster.Examples
             yAmplitudes = new float[waveCount];
             zAmplitudes = new float[waveCount];
             
-            // 為每個波設定隨機參數
+            // Set random parameters for each wave
             for (int i = 0; i < waveCount; i++)
             {
-                // 頻率 - 使用不同的倍數以產生複雜的移動模式
+                // Frequency - use different multiples to create complex movement patterns
                 float baseFreq = 0.5f + i * 0.3f;
                 xFrequencies[i] = baseFreq + Random.Range(-frequencyRange * 0.5f, frequencyRange * 0.5f);
                 yFrequencies[i] = baseFreq + Random.Range(-frequencyRange * 0.5f, frequencyRange * 0.5f);
                 zFrequencies[i] = baseFreq + Random.Range(-frequencyRange * 0.5f, frequencyRange * 0.5f);
                 
-                // 相位 - 隨機初始相位
+                // Phase - random initial phase
                 xPhases[i] = Random.Range(0f, phaseRandomness);
                 yPhases[i] = Random.Range(0f, phaseRandomness);
                 zPhases[i] = Random.Range(0f, phaseRandomness);
                 
-                // 振幅 - 遞減以使主要波影響較大
+                // Amplitude - decreases to make primary waves have more influence
                 float amplitudeFactor = 1f / (i + 1);
                 xAmplitudes[i] = amplitudeFactor;
                 yAmplitudes[i] = amplitudeFactor;
@@ -77,10 +77,10 @@ namespace CurveMaster.Examples
         
         private void Update()
         {
-            // 計算新位置
+            // Calculate new position
             Vector3 offset = CalculateOffset(Time.time * baseSpeed);
             
-            // 套用位置
+            // Apply position
             transform.position = startPosition + offset;
         }
         
@@ -88,20 +88,20 @@ namespace CurveMaster.Examples
         {
             Vector3 result = Vector3.zero;
             
-            // 計算每個軸的偏移
+            // Calculate offset for each axis
             for (int i = 0; i < waveCount; i++)
             {
-                // X軸
+                // X axis
                 result.x += Mathf.Sin(time * xFrequencies[i] + xPhases[i] * Mathf.Deg2Rad) * xAmplitudes[i];
                 
-                // Y軸
+                // Y axis
                 result.y += Mathf.Sin(time * yFrequencies[i] + yPhases[i] * Mathf.Deg2Rad) * yAmplitudes[i];
                 
-                // Z軸
+                // Z axis
                 result.z += Mathf.Sin(time * zFrequencies[i] + zPhases[i] * Mathf.Deg2Rad) * zAmplitudes[i];
             }
             
-            // 正規化並套用移動範圍
+            // Normalize and apply movement range
             result.x *= moveRange.x;
             result.y *= moveRange.y;
             result.z *= moveRange.z;
@@ -111,13 +111,13 @@ namespace CurveMaster.Examples
         
         private void OnDrawGizmosSelected()
         {
-            // 繪製移動範圍
+            // Draw movement range
             Vector3 center = Application.isPlaying ? startPosition : transform.position;
             
             Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.3f);
             Gizmos.DrawWireCube(center, moveRange * 2f);
             
-            // 繪製當前位置到中心的連線
+            // Draw line from current position to center
             if (Application.isPlaying)
             {
                 Gizmos.color = Color.yellow;

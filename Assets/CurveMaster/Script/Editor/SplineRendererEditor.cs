@@ -5,7 +5,7 @@ using CurveMaster.Components;
 namespace CurveMaster.Editor
 {
     /// <summary>
-    /// SplineRenderer 編輯器
+    /// SplineRenderer Editor
     /// </summary>
     [CustomEditor(typeof(SplineRenderer))]
     public class SplineRendererEditor : UnityEditor.Editor
@@ -34,15 +34,15 @@ namespace CurveMaster.Editor
             serializedObject.Update();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("曲線渲染設定", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Spline Rendering Settings", EditorStyles.boldLabel);
             
-            EditorGUILayout.PropertyField(splineManagerProp, new GUIContent("曲線管理器"));
+            EditorGUILayout.PropertyField(splineManagerProp, new GUIContent("Spline Manager"));
             
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("渲染參數", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Render Parameters", EditorStyles.boldLabel);
             
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.IntSlider(renderResolutionProp, 10, 200, new GUIContent("渲染解析度"));
+            EditorGUILayout.IntSlider(renderResolutionProp, 10, 200, new GUIContent("Render Resolution"));
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
@@ -50,22 +50,22 @@ namespace CurveMaster.Editor
             }
             
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.Slider(lineWidthProp, 0.01f, 1f, new GUIContent("線條寬度"));
+            EditorGUILayout.Slider(lineWidthProp, 0.01f, 1f, new GUIContent("Line Width"));
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
                 splineRenderer.SetLineWidth(lineWidthProp.floatValue);
             }
 
-            EditorGUILayout.PropertyField(autoUpdateProp, new GUIContent("自動更新"));
+            EditorGUILayout.PropertyField(autoUpdateProp, new GUIContent("Auto Update"));
             
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("視覺效果", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Visual Effects", EditorStyles.boldLabel);
             
-            EditorGUILayout.PropertyField(lineMaterialProp, new GUIContent("線條材質"));
+            EditorGUILayout.PropertyField(lineMaterialProp, new GUIContent("Line Material"));
             
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(colorGradientProp, new GUIContent("顏色漸層"));
+            EditorGUILayout.PropertyField(colorGradientProp, new GUIContent("Color Gradient"));
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
@@ -74,15 +74,15 @@ namespace CurveMaster.Editor
 
             EditorGUILayout.Space();
             
-            if (GUILayout.Button("更新渲染"))
+            if (GUILayout.Button("Update Render"))
             {
                 splineRenderer.UpdateSplineVisualization();
             }
 
             EditorGUILayout.Space();
             EditorGUILayout.HelpBox(
-                "SplineRenderer 使用 LineRenderer 在 Scene 和 Game 視圖中渲染曲線。\n" +
-                "可以調整解析度、寬度和顏色來獲得最佳視覺效果。", 
+                "SplineRenderer uses LineRenderer to render curves in Scene and Game views.\n" +
+                "Adjust resolution, width and color for best visual results.", 
                 MessageType.Info);
 
             serializedObject.ApplyModifiedProperties();

@@ -33,9 +33,9 @@ namespace CurveMaster.Editor
         {
             serializedObject.Update();
             
-            // 簡潔的說明
+            // Simple description
             EditorGUILayout.HelpBox(
-                "自動維持曲線形狀。有追蹤器的控制點為固定點，其他點會自動調整。", 
+                "Automatically maintains curve shape. Control points with trackers are fixed, others adjust automatically.", 
                 MessageType.None);
             
             EditorGUILayout.Space();

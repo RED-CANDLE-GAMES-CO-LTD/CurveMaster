@@ -5,7 +5,7 @@ using CurveMaster.Components;
 namespace CurveMaster.Editor
 {
     /// <summary>
-    /// SplineCursor 編輯器
+    /// SplineCursor Editor
     /// </summary>
     [CustomEditor(typeof(SplineCursor))]
     public class SplineCursorEditor : UnityEditor.Editor
@@ -24,7 +24,7 @@ namespace CurveMaster.Editor
             alignToTangentProp = serializedObject.FindProperty("alignToTangent");
             autoUpdateProp = serializedObject.FindProperty("autoUpdate");
             
-            // 強制初始化並更新位置
+            // Force initialization and update position
             if (cursor != null)
             {
                 cursor.UpdateTransform();
@@ -36,14 +36,14 @@ namespace CurveMaster.Editor
             serializedObject.Update();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("曲線跟隨設定", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Spline Follow Settings", EditorStyles.boldLabel);
             
-            EditorGUILayout.PropertyField(splineManagerProp, new GUIContent("曲線管理器"));
+            EditorGUILayout.PropertyField(splineManagerProp, new GUIContent("Spline Manager"));
             
             EditorGUILayout.Space();
             
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.Slider(positionProp, 0f, 1f, new GUIContent("位置"));
+            EditorGUILayout.Slider(positionProp, 0f, 1f, new GUIContent("Position"));
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
@@ -53,27 +53,27 @@ namespace CurveMaster.Editor
                 }
             }
 
-            EditorGUILayout.PropertyField(alignToTangentProp, new GUIContent("對齊切線"));
-            EditorGUILayout.PropertyField(autoUpdateProp, new GUIContent("自動更新"));
+            EditorGUILayout.PropertyField(alignToTangentProp, new GUIContent("Align To Tangent"));
+            EditorGUILayout.PropertyField(autoUpdateProp, new GUIContent("Auto Update"));
 
             EditorGUILayout.Space();
             
-            if (GUILayout.Button("更新位置"))
+            if (GUILayout.Button("Update Position"))
             {
                 cursor.UpdateTransform();
             }
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("動畫測試", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Animation Test", EditorStyles.boldLabel);
             
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("重置到起點"))
+            if (GUILayout.Button("Reset to Start"))
             {
                 positionProp.floatValue = 0f;
                 serializedObject.ApplyModifiedProperties();
                 cursor.UpdateTransform();
             }
-            if (GUILayout.Button("移到終點"))
+            if (GUILayout.Button("Move to End"))
             {
                 positionProp.floatValue = 1f;
                 serializedObject.ApplyModifiedProperties();
