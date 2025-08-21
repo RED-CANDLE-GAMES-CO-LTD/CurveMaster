@@ -25,23 +25,23 @@ namespace CurveMaster.Components
         }
         
         [Header("形狀維持設定")]
-        [SerializeField] private bool enableShapeKeeping = true;
         [SerializeField] private ShapeMode shapeMode = ShapeMode.Rigid;
         [SerializeField] private ShapePreservation preservationMode = ShapePreservation.Absolute;
-        
-        [Header("控制點設定")]
-        [SerializeField] private List<ControlPointConfig> controlPointConfigs = new List<ControlPointConfig>();
         
         [Header("形狀參數")]
         [SerializeField] private float elasticity = 0.5f;  // 彈性係數
         [SerializeField] private float smoothness = 0.95f;  // 平滑度
-        [SerializeField] private bool maintainLocalSpace = false;  // 維持局部空間關係
         [SerializeField] private float shapeFidelity = 1.0f;  // 形狀保真度 (0-1)
         [SerializeField] private float compressionResponse = 1.5f;  // 壓縮響應係數 (>1 增大彎曲)
         
-        [Header("更新設定")]
-        [SerializeField] private bool autoDetectTrackers = true;
+        [Header("進階設定")]
+        [Tooltip("停用自動偵測以手動設定控制點角色")]
+        [SerializeField] private bool manualMode = false;
         [SerializeField] private float updateRate = 60f;
+        
+        [Header("控制點角色 (自動偵測中)")]
+        [SerializeField, HideInInspector] 
+        private List<ControlPointConfig> controlPointConfigs = new List<ControlPointConfig>();
         
         // 內部變數
         private SplineManager splineManager;
@@ -119,7 +119,7 @@ namespace CurveMaster.Components
         
         private void Start()
         {
-            if (autoDetectTrackers)
+            if (!manualMode)
             {
                 DetectAndConfigureTrackers();
             }
@@ -138,7 +138,7 @@ namespace CurveMaster.Components
         
         private void LateUpdate()
         {
-            if (!enableShapeKeeping || !hasRecordedInitialShape)
+            if (!hasRecordedInitialShape)
                 return;
             
             // 限制更新頻率
@@ -598,7 +598,7 @@ namespace CurveMaster.Components
         
         private void OnDrawGizmosSelected()
         {
-            if (!enableShapeKeeping || controlPoints == null)
+            if (controlPoints == null)
                 return;
             
             // 顯示不同角色的控制點

@@ -1,0 +1,66 @@
+using UnityEngine;
+using UnityEditor;
+using CurveMaster.Components;
+
+namespace CurveMaster.Editor
+{
+    /// <summary>
+    /// SplineShapeKeeper 編輯器 - 極簡介面設計
+    /// </summary>
+    [CustomEditor(typeof(SplineShapeKeeper))]
+    public class SplineShapeKeeperEditor : UnityEditor.Editor
+    {
+        private SerializedProperty shapeMode;
+        private SerializedProperty preservationMode;
+        private SerializedProperty elasticity;
+        private SerializedProperty smoothness;
+        private SerializedProperty shapeFidelity;
+        private SerializedProperty compressionResponse;
+        private SerializedProperty updateRate;
+        
+        private void OnEnable()
+        {
+            shapeMode = serializedObject.FindProperty("shapeMode");
+            preservationMode = serializedObject.FindProperty("preservationMode");
+            elasticity = serializedObject.FindProperty("elasticity");
+            smoothness = serializedObject.FindProperty("smoothness");
+            shapeFidelity = serializedObject.FindProperty("shapeFidelity");
+            compressionResponse = serializedObject.FindProperty("compressionResponse");
+            updateRate = serializedObject.FindProperty("updateRate");
+        }
+        
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            
+            // 簡潔的說明
+            EditorGUILayout.HelpBox(
+                "自動維持曲線形狀。有追蹤器的控制點為固定點，其他點會自動調整。", 
+                MessageType.None);
+            
+            EditorGUILayout.Space();
+            
+            // 主要設定
+            EditorGUILayout.PropertyField(shapeMode);
+            EditorGUILayout.PropertyField(preservationMode);
+            
+            EditorGUILayout.Space();
+            
+            // 參數
+            if (shapeMode.enumValueIndex == (int)SplineShapeKeeper.ShapeMode.Elastic)
+            {
+                EditorGUILayout.PropertyField(elasticity);
+            }
+            
+            EditorGUILayout.PropertyField(smoothness);
+            EditorGUILayout.PropertyField(shapeFidelity);
+            
+            if (preservationMode.enumValueIndex == (int)SplineShapeKeeper.ShapePreservation.ElasticBend)
+            {
+                EditorGUILayout.PropertyField(compressionResponse);
+            }
+            
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
+}
