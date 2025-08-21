@@ -95,8 +95,7 @@ Desktop.ini
 .claude/
 
 # Unity Package Manager
-/[Pp]ackages/
-/[Pp]roject[Ss]ettings/
+/[Pp]ackages/packages-lock.json
 
 # Unity Recordings
 *.mp4

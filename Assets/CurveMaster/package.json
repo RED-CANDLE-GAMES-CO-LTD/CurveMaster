@@ -1,0 +1,33 @@
+{
+  "name": "com.redcandlegames.curvemaster",
+  "version": "1.0.0",
+  "displayName": "CurveMaster",
+  "description": "A comprehensive spline/curve system extracted from Nine Sols, featuring multiple spline implementations with intuitive Scene view editing tools.",
+  "unity": "2021.3",
+  "unityRelease": "0f1",
+  "documentationUrl": "https://github.com/RED-CANDLE-GAMES-CO-LTD/CurveMaster",
+  "changelogUrl": "https://github.com/RED-CANDLE-GAMES-CO-LTD/CurveMaster/releases",
+  "licensesUrl": "https://github.com/RED-CANDLE-GAMES-CO-LTD/CurveMaster/blob/main/LICENSE",
+  "dependencies": {},
+  "keywords": [
+    "spline",
+    "curve",
+    "bezier",
+    "catmull-rom",
+    "b-spline",
+    "animation",
+    "path"
+  ],
+  "author": {
+    "name": "Red Candle Games",
+    "email": "contact@redcandlegames.com",
+    "url": "https://www.redcandlegames.com"
+  },
+  "samples": [
+    {
+      "displayName": "Basic Examples",
+      "description": "Basic spline setup and usage examples",
+      "path": "Samples~"
+    }
+  ]
+}
