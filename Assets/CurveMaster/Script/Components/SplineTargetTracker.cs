@@ -30,11 +30,16 @@ namespace CurveMaster.Components
         [SerializeField] private Vector3 targetOffset = Vector3.zero;
         [SerializeField] private bool useLocalOffset = false;
         
+        [Header("Initialization")]
+        [Tooltip("Instantly snap to target position when GameObject is enabled")]
+        [SerializeField] private bool snapOnEnable = true;
+        
         // 內部變數
         private SplineControlPoint controlPoint;
         private Vector3 velocity;
         private Vector3 originalPosition;
         private bool hasOriginalPosition;
+        private bool justEnabled;
         
         public bool EnableTracking
         {
@@ -71,12 +76,27 @@ namespace CurveMaster.Components
                 originalPosition = transform.position;
                 hasOriginalPosition = true;
             }
+            
+            // Mark as just enabled for instant snap
+            justEnabled = snapOnEnable;
+            
+            // Don't update position here - wait for LateUpdate to ensure proper order
+            // This prevents jitter when multiple components are updating
         }
         
         private void LateUpdate()
         {
             if (!enableTracking || targetObject == null)
                 return;
+            
+            // If just enabled and snap is on, do instant update first
+            if (justEnabled && snapOnEnable)
+            {
+                transform.position = CalculateTargetPosition();
+                velocity = Vector3.zero; // Reset velocity for spring mode
+                justEnabled = false;
+                return; // Skip normal update this frame since we're already at target
+            }
             
             UpdateTracking();
         }
@@ -176,6 +196,18 @@ namespace CurveMaster.Components
             trackingMode = mode;
             trackingSpeed = speed;
             enableTracking = target != null;
+        }
+        
+        /// <summary>
+        /// Force immediate snap to target position (used by ShapeKeeper)
+        /// </summary>
+        public void ForceToTarget()
+        {
+            if (enableTracking && targetObject != null)
+            {
+                transform.position = CalculateTargetPosition();
+                velocity = Vector3.zero;
+            }
         }
         
         private void OnDrawGizmosSelected()

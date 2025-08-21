@@ -17,6 +17,7 @@ namespace CurveMaster.Editor
         private SerializedProperty shapeFidelity;
         private SerializedProperty compressionResponse;
         private SerializedProperty updateRate;
+        private SerializedProperty snapOnEnable;
         
         private void OnEnable()
         {
@@ -27,6 +28,7 @@ namespace CurveMaster.Editor
             shapeFidelity = serializedObject.FindProperty("shapeFidelity");
             compressionResponse = serializedObject.FindProperty("compressionResponse");
             updateRate = serializedObject.FindProperty("updateRate");
+            snapOnEnable = serializedObject.FindProperty("snapOnEnable");
         }
         
         public override void OnInspectorGUI()
@@ -40,9 +42,10 @@ namespace CurveMaster.Editor
             
             EditorGUILayout.Space();
             
-            // 主要設定
+            // Main settings
             EditorGUILayout.PropertyField(shapeMode);
             EditorGUILayout.PropertyField(preservationMode);
+            EditorGUILayout.PropertyField(snapOnEnable);
             
             EditorGUILayout.Space();
             

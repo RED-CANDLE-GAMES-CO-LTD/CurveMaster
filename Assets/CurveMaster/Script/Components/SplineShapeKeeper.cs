@@ -39,6 +39,10 @@ namespace CurveMaster.Components
         [SerializeField] private bool manualMode = false;
         [SerializeField] private float updateRate = 60f;
         
+        [Header("Initialization")]
+        [Tooltip("Instantly snap to stable shape when GameObject is enabled")]
+        [SerializeField] private bool snapOnEnable = true;
+        
         [Header("控制點角色 (自動偵測中)")]
         [SerializeField, HideInInspector] 
         private List<ControlPointConfig> controlPointConfigs = new List<ControlPointConfig>();
@@ -48,6 +52,7 @@ namespace CurveMaster.Components
         private float lastUpdateTime;
         private List<Transform> controlPoints;
         private Dictionary<Transform, ControlPointRole> pointRoles;
+        private bool justEnabled;
         
         // 相對位置記錄
         private Dictionary<Transform, RelativePositionData> relativePositions;
@@ -129,11 +134,14 @@ namespace CurveMaster.Components
         
         private void OnEnable()
         {
-            // 重新記錄形狀，避免破壞現有曲線
+            // 重新記錄形狀，避免破壾現有曲線
             if (!hasRecordedInitialShape)
             {
                 RecordInitialShape();
             }
+            
+            // Mark as just enabled for instant snap
+            justEnabled = snapOnEnable;
         }
         
         private void LateUpdate()
@@ -146,7 +154,36 @@ namespace CurveMaster.Components
                 return;
             
             lastUpdateTime = Time.time;
-            UpdateShape();
+            
+            // On first frame after enable, force instant update
+            if (justEnabled && snapOnEnable)
+            {
+                // Force all trackers to update first
+                foreach (var point in controlPoints)
+                {
+                    if (point == null) continue;
+                    var tracker = point.GetComponent<SplineTargetTracker>();
+                    if (tracker != null && tracker.EnableTracking && tracker.TargetObject != null)
+                    {
+                        // Force tracker to its target position immediately
+                        tracker.ForceToTarget();
+                    }
+                }
+                
+                // Now update shape instantly
+                UpdateShapeInstant();
+                justEnabled = false;
+            }
+            else
+            {
+                UpdateShape();
+            }
+            
+            // Clear flag after first update
+            if (justEnabled)
+            {
+                justEnabled = false;
+            }
         }
         
         /// <summary>
@@ -337,6 +374,39 @@ namespace CurveMaster.Components
                     UpdateElasticShape();
                     break;
             }
+            
+            // Clear just enabled flag after first update
+            if (justEnabled)
+            {
+                justEnabled = false;
+            }
+        }
+        
+        /// <summary>
+        /// Instantly update shape without smoothing (for initialization)
+        /// </summary>
+        private void UpdateShapeInstant()
+        {
+            if (controlPoints == null || controlPoints.Count < 2)
+                return;
+            
+            // Temporarily set justEnabled to force instant positioning
+            bool wasJustEnabled = justEnabled;
+            justEnabled = true;
+            
+            // Update shape based on mode
+            switch (shapeMode)
+            {
+                case ShapeMode.Rigid:
+                    UpdateRigidShape();
+                    break;
+                case ShapeMode.Elastic:
+                    UpdateElasticShape();
+                    break;
+            }
+            
+            // Restore justEnabled state
+            justEnabled = wasJustEnabled;
         }
         
         /// <summary>
@@ -479,8 +549,15 @@ namespace CurveMaster.Components
                     targetPos = currentFirst.position + data.relativeToFirst * stretchFactor;
                 }
                 
-                // 平滑移動到目標位置
-                autoPoint.position = Vector3.Lerp(autoPoint.position, targetPos, smoothness);
+                // 平滑移動到目標位置（除非剛啟用）
+                if (justEnabled)
+                {
+                    autoPoint.position = targetPos;
+                }
+                else
+                {
+                    autoPoint.position = Vector3.Lerp(autoPoint.position, targetPos, smoothness);
+                }
             }
         }
         
@@ -504,7 +581,16 @@ namespace CurveMaster.Components
                 
                 // 簡單地跟隨固定點移動
                 Vector3 targetPos = transform.TransformPoint(data.localOffset) + movement;
-                autoPoint.position = Vector3.Lerp(autoPoint.position, targetPos, smoothness);
+                
+                // Apply position with or without smoothing
+                if (justEnabled)
+                {
+                    autoPoint.position = targetPos;
+                }
+                else
+                {
+                    autoPoint.position = Vector3.Lerp(autoPoint.position, targetPos, smoothness);
+                }
             }
         }
         
@@ -563,7 +649,16 @@ namespace CurveMaster.Components
                 {
                     force /= forceCount;
                     Vector3 targetPos = point.position + force;
-                    point.position = Vector3.Lerp(point.position, targetPos, smoothness * Time.deltaTime * 10f);
+                    
+                    // Apply position with or without smoothing
+                    if (justEnabled)
+                    {
+                        point.position = targetPos;
+                    }
+                    else
+                    {
+                        point.position = Vector3.Lerp(point.position, targetPos, smoothness * Time.deltaTime * 10f);
+                    }
                 }
             }
         }
