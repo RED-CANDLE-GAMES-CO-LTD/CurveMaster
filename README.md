@@ -5,6 +5,23 @@ A comprehensive spline/curve system for Unity, extracted and reimplemented from 
 ![Unity Version](https://img.shields.io/badge/Unity-2021.3%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+## Showcase
+
+### Original Nine Sols Implementation
+The flying sword mechanics from boss "Ji" in Nine Sols - the inspiration for this system:
+
+![Nine Sols Ji Boss Fight](docs/images/ji-ninesols-gameplay.gif)
+
+### Nine Sols Editor
+How developers edit the flying sword spline paths in the Nine Sols editor:
+
+![Nine Sols Editor](docs/images/ji-ninesols-editor.gif)
+
+### CurveMaster in Action
+Our reimplemented system running in Unity:
+
+![CurveMaster Demo](docs/images/curvemaster-demo.gif)
+
 ## Quick Start
 
 ### Installation via Unity Package Manager
