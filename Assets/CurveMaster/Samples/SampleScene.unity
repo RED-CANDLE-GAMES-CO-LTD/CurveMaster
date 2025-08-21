@@ -149,6 +149,7 @@ MonoBehaviour:
   maxDistance: 10
   targetOffset: {x: 0, y: 0, z: 0}
   useLocalOffset: 0
+  snapOnEnable: 1
 --- !u!4 &184145288 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1100307877071092300, guid: 758f5a5867eb6400da0d066bbf2a348b, type: 3}
@@ -749,6 +750,7 @@ MonoBehaviour:
   maxDistance: 10
   targetOffset: {x: 0, y: 0, z: 0}
   useLocalOffset: 0
+  snapOnEnable: 1
 --- !u!1 &1239087179
 GameObject:
   m_ObjectHideFlags: 0
@@ -1073,6 +1075,7 @@ MonoBehaviour:
   maxDistance: 10
   targetOffset: {x: 0, y: 0, z: 0}
   useLocalOffset: 0
+  snapOnEnable: 1
 --- !u!1001 &6626842922492961608
 PrefabInstance:
   m_ObjectHideFlags: 0
