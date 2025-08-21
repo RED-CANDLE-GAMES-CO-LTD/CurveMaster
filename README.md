@@ -28,14 +28,15 @@ Our reimplemented system running in Unity:
 
 1. Open Unity Package Manager (Window → Package Manager)
 2. Click the **+** button and select **"Add package from git URL..."**
-3. Enter: `https://github.com/RED-CANDLE-GAMES-CO-LTD/CurveMaster.git`
+3. Enter: `https://github.com/RED-CANDLE-GAMES-CO-LTD/CurveMaster.git?path=Assets/CurveMaster`
 4. Click **Add**
+5. **Important for first-time users**: After installation, go to the Package Manager, find CurveMaster in the list, and click **Samples → Basic Examples → Import** to get the sample scene. This will help you understand the system quickly!
 
 ### Basic Usage
 
-#### Option 1: Quick Setup
-1. Check out `Assets/CurveMaster/Samples/SampleScene.unity` for a complete example
-2. Simply drag the `[Spline].prefab` into your scene and you're ready to go!
+#### Option 1: Quick Setup (Recommended)
+1. After importing the **Basic Examples** from Package Manager, open `SampleScene.unity` to see a complete working example
+2. Or simply drag the `[Spline].prefab` from the package into your scene and you're ready to go!
 
 #### Option 2: Manual Setup
 1. Create an empty GameObject
