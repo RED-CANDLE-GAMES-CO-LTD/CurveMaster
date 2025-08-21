@@ -37,6 +37,7 @@ Our reimplemented system running in Unity:
 #### Option 1: Quick Setup (Recommended)
 1. After importing the **Basic Examples** from Package Manager, open `SampleScene.unity` to see a complete working example
 2. Or simply drag the `[Spline].prefab` from the package into your scene and you're ready to go!
+3. **Important**: Make sure **Gizmos** are enabled in the Scene view (click the Gizmos button in the Scene view toolbar) to see the spline paths!
 
 #### Option 2: Manual Setup
 1. Create an empty GameObject
