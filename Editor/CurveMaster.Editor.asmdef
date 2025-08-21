@@ -2,7 +2,7 @@
     "name": "CurveMaster.Editor",
     "rootNamespace": "CurveMaster.Editor",
     "references": [
-        "CurveMaster"
+        "CurveMaster.Runtime"
     ],
     "includePlatforms": [
         "Editor"

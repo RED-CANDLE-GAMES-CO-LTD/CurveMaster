@@ -1,5 +1,5 @@
 {
-    "name": "CurveMaster",
+    "name": "CurveMaster.Runtime",
     "rootNamespace": "CurveMaster",
     "references": [],
     "includePlatforms": [],
