@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2212457336087237060}
   - component: {fileID: 4215888559763060660}
+  - component: {fileID: 7787836449832916818}
   m_Layer: 0
   m_Name: '[Spline]'
   m_TagString: Untagged
@@ -52,6 +53,29 @@ MonoBehaviour:
   resolution: 50
   autoDetectControlPoints: 1
   autoUpdateCursors: 1
+--- !u!114 &7787836449832916818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4867604341983713314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56c131b822d584437befce9c38c66b16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableShapeKeeping: 1
+  shapeMode: 0
+  preservationMode: 1
+  controlPointConfigs: []
+  elasticity: 0.5
+  smoothness: 0.95
+  maintainLocalSpace: 0
+  shapeFidelity: 1
+  compressionResponse: 1.5
+  autoDetectTrackers: 1
+  updateRate: 60
 --- !u!1001 &1087362302854471741
 PrefabInstance:
   m_ObjectHideFlags: 0

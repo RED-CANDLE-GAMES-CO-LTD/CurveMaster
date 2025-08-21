@@ -83,17 +83,56 @@ namespace CurveMaster.Components
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = pointColor;
-            Gizmos.DrawWireSphere(transform.position, gizmoSize);
+            // 檢查是否有追蹤器
+            var tracker = GetComponent<SplineTargetTracker>();
+            bool hasTracker = tracker != null && tracker.EnableTracking;
+            
+            if (hasTracker)
+            {
+                // 有追蹤器時顯示不同的 Gizmo
+                Gizmos.color = new Color(0, 1, 1, 0.8f); // 青色
+                Gizmos.DrawWireCube(transform.position, Vector3.one * gizmoSize * 2f);
+                
+                // 畫一個小的內圈表示是控制點
+                Gizmos.color = pointColor * 0.5f;
+                Gizmos.DrawWireSphere(transform.position, gizmoSize * 0.5f);
+            }
+            else
+            {
+                // 一般控制點
+                Gizmos.color = pointColor;
+                Gizmos.DrawWireSphere(transform.position, gizmoSize);
+            }
         }
 
         private void OnDrawGizmosSelected()
         {
-            if (parentSpline == null)
-                return;
-
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, gizmoSize * 1.5f);
+            // 檢查是否有追蹤器
+            var tracker = GetComponent<SplineTargetTracker>();
+            bool hasTracker = tracker != null && tracker.EnableTracking;
+            
+            if (hasTracker)
+            {
+                // 選中時顯示更明顯的標記
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireCube(transform.position, Vector3.one * gizmoSize * 2.5f);
+                
+                // 顯示追蹤狀態
+                if (tracker.TargetObject != null)
+                {
+                    Gizmos.color = new Color(1, 1, 0, 0.3f);
+                    Gizmos.DrawLine(transform.position, tracker.TargetObject.position);
+                }
+            }
+            else
+            {
+                // 一般選中狀態
+                if (parentSpline != null)
+                {
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawWireSphere(transform.position, gizmoSize * 1.5f);
+                }
+            }
         }
     }
 }
