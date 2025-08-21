@@ -69,7 +69,9 @@ namespace CurveMaster.Editor
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();
-                splineRenderer.SetColorGradient(colorGradientProp.gradientValue);
+                // For Unity 2021.3 compatibility, we apply changes through serialization
+                // instead of using gradientValue which was added in Unity 2022.1
+                splineRenderer.UpdateSplineVisualization();
             }
 
             EditorGUILayout.Space();
