@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using CurveMaster.Components;
@@ -101,3 +102,4 @@ namespace CurveMaster.Editor
         }
     }
 }
+#endif
