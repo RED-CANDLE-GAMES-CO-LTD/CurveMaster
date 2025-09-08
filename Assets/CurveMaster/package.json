@@ -1,6 +1,6 @@
 {
   "name": "com.redcandlegames.curvemaster",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "CurveMaster",
   "description": "A comprehensive spline/curve system extracted from Nine Sols, featuring multiple spline implementations with intuitive Scene view editing tools.",
   "unity": "2021.3",
