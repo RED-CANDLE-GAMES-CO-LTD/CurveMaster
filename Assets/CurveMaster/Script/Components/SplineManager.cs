@@ -369,6 +369,7 @@ namespace CurveMaster.Components
             UpdateControlPoints();
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             DrawSpline(false);
@@ -426,5 +427,6 @@ namespace CurveMaster.Components
                     $"[{splineType}] Length: {GetLength():F2}");
             }
         }
+#endif
     }
 }
